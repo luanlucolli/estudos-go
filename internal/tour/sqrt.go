@@ -9,28 +9,31 @@ func Sqrt(x float64) float64 {
 
 	fmt.Println("Calculando a raiz quadrada de:", x)
 
-	// tratamento de exceções
-	if x < 0 {
+	// tratamento de casos de borda
+	if x < 0 || math.IsNaN(x) {
 		return math.NaN()
 	}
 
-	if x == 0 {
-		return 0
+	if x == 0 || math.IsInf(x, 1) {
+		return x
 	}
 
 	// variaveis iniciais
 	z := 1.0
-	previousZ := 0.0
+	previousZ := z
+	maxIterations := 20
+	// loop que itera até z * z estiver próximo de x
+	for range maxIterations {
 
-	// loop que itera até z * z estiver suficientemente próximo de x
-	for {
+		if math.IsInf(z, 0) {
+			break
+		}
 
 		z -= (z*z - x) / (2 * z)
-		if math.Abs(z-previousZ) < 1e-6 {
+		if math.Abs(z-previousZ) < 1e-10 {
 			break
 		}
 		previousZ = z
-		fmt.Println(z)
 
 	}
 

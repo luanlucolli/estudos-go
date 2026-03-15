@@ -1,3 +1,3 @@
-module github.com/luanlucolli/hello-go
+module github.com/luanlucolli/estudos-go
 
-go 1.25.4
+go 1.26.0
