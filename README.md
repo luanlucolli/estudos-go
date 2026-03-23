@@ -1,4 +1,8 @@
-aqui eu aprendo golang
-  <a href="https://go.dev/" target="_blank" rel="noreferrer"> 
-    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/go/go-original.svg" alt="Go" width="30" height="30"/> 
-  </a> 
+# Estudos Go
+
+Repositório único para estudos de Go, separado por trilhas:
+
+- `tour-of-go`: exercícios do Tour of Go
+- `a-linguagem-go`: exercícios do livro *A Linguagem de Programação Go*
+
+
