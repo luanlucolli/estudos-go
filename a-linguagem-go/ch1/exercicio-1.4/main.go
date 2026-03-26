@@ -11,17 +11,19 @@ import (
 
 func main() {
 	counts := make(map[string]int)
+	lineFiles := make(map[string]string)
 	files := os.Args[1:]
 	if len(files) == 0 {
-		countLines(os.Stdin, counts)
+		countLines(os.Stdin, counts, lineFiles, "stdin")
 	} else {
 		for _, arg := range files {
+			fileName := arg
 			f, err := os.Open(arg)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "dup2: %v\n", err)
 				continue
 			}
-			countLines(f, counts)
+			countLines(f, counts, lineFiles, fileName)
 			f.Close()
 		}
 	}
@@ -31,7 +33,7 @@ func main() {
 		}
 	}
 }
-func countLines(f *os.File, counts map[string]int) {
+func countLines(f *os.File, counts map[string]int, lineFiles map[string]string, fileName string) {
 	input := bufio.NewScanner(f)
 	for input.Scan() {
 		counts[input.Text()]++
