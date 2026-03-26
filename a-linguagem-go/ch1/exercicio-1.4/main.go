@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -17,25 +18,29 @@ func main() {
 		countLines(os.Stdin, counts, lineFiles, "stdin")
 	} else {
 		for _, arg := range files {
-			fileName := arg
 			f, err := os.Open(arg)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "dup2: %v\n", err)
 				continue
 			}
-			countLines(f, counts, lineFiles, fileName)
+			countLines(f, counts, lineFiles, arg)
 			f.Close()
 		}
 	}
 	for line, n := range counts {
 		if n > 1 {
-			fmt.Printf("%d\t%s\n", n, line)
+			fmt.Printf("%d\t%s\t%s\n", n, line, lineFiles[line])
 		}
 	}
 }
+
 func countLines(f *os.File, counts map[string]int, lineFiles map[string]string, fileName string) {
 	input := bufio.NewScanner(f)
 	for input.Scan() {
-		counts[input.Text()]++
+		line := input.Text()
+		counts[line]++
+		if !strings.Contains(lineFiles[line], fileName) {
+			lineFiles[line] += fileName + " "
+		}
 	} // NOTA: ignorando erros em potencial de input.Err()
 }
