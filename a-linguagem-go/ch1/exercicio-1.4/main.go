@@ -27,11 +27,9 @@ func main() {
 			f.Close()
 		}
 	}
-	for line, n := range counts {
-		if n > 1 {
-			fmt.Printf("%d\t%s\t%s\n", n, line, lineFiles[line])
-		}
-	}
+
+	printDuplicates(counts, lineFiles)
+
 }
 
 func countLines(f *os.File, counts map[string]int, lineFiles map[string]string, fileName string) {
@@ -43,4 +41,12 @@ func countLines(f *os.File, counts map[string]int, lineFiles map[string]string, 
 			lineFiles[line] += fileName + " "
 		}
 	} // NOTA: ignorando erros em potencial de input.Err()
+}
+
+func printDuplicates(counts map[string]int, lineFiles map[string]string) {
+	for line, n := range counts {
+		if n > 1 {
+			fmt.Printf("%d\t%s\t%s\n", n, line, lineFiles[line])
+		}
+	}
 }
