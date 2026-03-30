@@ -1,3 +1,9 @@
+/*Exercício 1.5: Altere a paleta de cores do programa Lissajous para verde
+sobre preto, para maior autenticidade. Para criar a cor web #RRGGBB, use
+color.RGBA{0xRR, 0xGG, 0xBB, 0xff}, em que cada par de dígitos
+hexadecimais representa a intensidade do componente vermelho, verde ou
+azul do pixel.*/
+
 // Lissajous gera animações GIF de figuras de Lissajous aleatórias
 package main
 
@@ -12,11 +18,11 @@ import (
 	"time"
 )
 
-var palette = []color.Color{color.White, color.Black}
+var palette = []color.Color{color.RGBA{0, 0, 0, 0xff}, color.RGBA{0, 0xff, 0, 0xff}}
 
 const (
-	whiteIndex = 0 // primeira cor da paleta
-	blackIndex = 1
+	blackIndex = 0 // primeira cor da paleta
+	greenIndex = 1
 
 // próxima cor da paleta
 )
@@ -46,7 +52,7 @@ func lissajous(out io.Writer) {
 			x := math.Sin(t)
 			y := math.Sin(t*freq + phase)
 			img.SetColorIndex(size+int(x*size+0.5), size+int(y*size+0.5),
-				blackIndex)
+				greenIndex)
 		}
 		phase += 0.1
 		anim.Delay = append(anim.Delay, delay)
