@@ -18,7 +18,6 @@ import (
 )
 
 func main() {
-
 	// valida numero minimo de args
 	if len(os.Args) < 3 {
 		fmt.Fprintf(os.Stderr, "Uso: go run main.go exec[n] url1 url2...\n")
@@ -45,6 +44,7 @@ func main() {
 	}
 	fmt.Printf("%.2fs elapsed\n", time.Since(start).Seconds())
 }
+
 func fetch(url string, ch chan<- string) {
 	start := time.Now()
 	resp, err := http.Get(url)
