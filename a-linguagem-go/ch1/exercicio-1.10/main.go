@@ -17,6 +17,11 @@ import (
 	"time"
 )
 
+const (
+	httpPrefix  = "http://"
+	httpsPrefix = "https://"
+)
+
 func main() {
 	// valida numero minimo de args
 	if len(os.Args) < 3 {
@@ -33,8 +38,8 @@ func main() {
 	start := time.Now()
 	ch := make(chan string)
 	for _, url := range os.Args[2:] {
-		if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
-			url = "http://" + url
+		if !strings.HasPrefix(url, httpPrefix) && !strings.HasPrefix(url, httpsPrefix) {
+			url = httpsPrefix + url
 		}
 		go fetch(url, ch) // inicia uma gorrotina
 	}
