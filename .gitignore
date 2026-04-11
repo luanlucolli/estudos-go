@@ -1,2 +1,6 @@
 .codex
 exec*
+
+# Artefatos gerados pelos exercícios
+*.gif
+*.txt
