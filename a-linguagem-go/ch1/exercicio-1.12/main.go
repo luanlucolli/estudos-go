@@ -1,9 +1,13 @@
-// Server2 é um servidor mínimo de "eco" e contador
+/* Exercício 1.12: Modifique o servidor Lissajous para ler valores de parâmetros
+do URL. Por exemplo, você pode organizá-lo de modo que um URL como
+http://localhost:8000/?cycles=20 defina o número de ciclos para 20,
+em vez de usar o default igual a 5. Utilize a função strconv.Atoi para
+converter o parâmetro do tipo string em um inteiro. Você pode ver a
+documentação da função usando go doc strconv.Atoi. */
+
 package main
 
 import (
-	//"fmt"
-	"fmt"
 	"image"
 	"image/color"
 	"image/gif"
@@ -50,34 +54,38 @@ func lissajous(out io.Writer, r *http.Request) {
 		valFloat, err := strconv.ParseFloat(valStr, 64)
 		if err != nil {
 			log.Printf("Erro ao converter query key '%s': %v", key, err)
-			break
+			continue
 		}
 
 		lissajousValues[key] = valFloat
 
-		fmt.Println(key, valFloat)
 	}
 
-	fmt.Println("")
-
-	intSize := int(lissajousValues["size"])
+	cycles := lissajousValues["cycles"]
+	res := lissajousValues["res"]
+	size := lissajousValues["size"]
+	nframes := lissajousValues["nframes"]
+	delay := lissajousValues["delay"]
+	intSize := int(size)
+	intNframes := int(nframes)
+	intDelay := int(delay)
 
 	var palette = []color.Color{color.RGBA{0, 0, 0, 0xff}, color.RGBA{0xff, 0, 0, 0xff}, color.RGBA{0, 0xff, 0, 0xff}, color.RGBA{0, 0, 0xff, 0xff}}
 
 	freq := rand.Float64() * 3.0 // frequência relativa do oscilador y
-	anim := gif.GIF{LoopCount: int(lissajousValues["nframes"])}
+	anim := gif.GIF{LoopCount: intNframes}
 	phase := 0.0 // diferença de fase
-	for i := 0; i < int(lissajousValues["nframes"]); i++ {
+	for i := 0; i < intNframes; i++ {
 		rect := image.Rect(0, 0, 2*intSize+1, 2*intSize+1)
 		img := image.NewPaletted(rect, palette)
-		for t := 0.0; t < lissajousValues["cycles"]*2*math.Pi; t += lissajousValues["res"] {
+		for t := 0.0; t < cycles*2*math.Pi; t += res {
 			x := math.Sin(t)
 			y := math.Sin(t*freq + phase)
-			img.SetColorIndex(intSize+int(x*lissajousValues["size"]+0.5), intSize+int(y*lissajousValues["size"]+0.5),
+			img.SetColorIndex(intSize+int(x*size+0.5), intSize+int(y*size+0.5),
 				uint8(rand.Intn(len(palette))))
 		}
 		phase += 0.1
-		anim.Delay = append(anim.Delay, int(lissajousValues["delay"]))
+		anim.Delay = append(anim.Delay, intDelay)
 		anim.Image = append(anim.Image, img)
 	}
 	gif.EncodeAll(out, &anim) // NOTA: ignorando erros de codificação
