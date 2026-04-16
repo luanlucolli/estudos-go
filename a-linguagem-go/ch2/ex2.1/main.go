@@ -35,11 +35,12 @@ func FToC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9) }
 func FToK(f Fahrenheit) Kelvin { return Kelvin((f-32)*5/9 + 273) }
 
 // KToC converte uma temperatura em Kelvin para Celsius.
-func KtoC(k Kelvin) Celsius { return Celsius(k - 273) }
+func KToC(k Kelvin) Celsius { return Celsius(k - 273) }
 
 // KToF converte uma temperatura em Kelvin para Fahrenheit.
-func KtoF(k Kelvin) Fahrenheit { return Fahrenheit((k-273)*1.8 + 32) }
+func KToF(k Kelvin) Fahrenheit { return Fahrenheit((k-273)*1.8 + 32) }
 
 func main() {
 	fmt.Println(CToK(1))
+	fmt.Println(KToC(1))
 }
