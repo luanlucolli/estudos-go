@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
-	fmt.Println(tempconv.CToK(0))
+	fmt.Println(tempconv.CToK(100))
 	fmt.Println(tempconv.KToC(273.15))
+	fmt.Println(tempconv.BoilingK.String())
 }
