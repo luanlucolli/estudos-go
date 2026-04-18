@@ -15,6 +15,7 @@ import (
 
 	"github.com/luanlucolli/estudos-go/a-linguagem-go/ch2/lenconv"
 	"github.com/luanlucolli/estudos-go/a-linguagem-go/ch2/tempconv"
+	"github.com/luanlucolli/estudos-go/a-linguagem-go/ch2/weightconv"
 )
 
 func main() {
@@ -32,11 +33,11 @@ func main() {
 		c := tempconv.Celsius(t)
 		ft := lenconv.Foot(t)
 		mt := lenconv.Meter(t)
-		//converter pra pés 1 pé = 0,3048 metros
-		//converter pra metros 1 metro = 3,28084 pés
+		p := weightconv.Pound(t)
+		kg := weightconv.Kilogram(t)
 		//peso em libras
 		//peso em quilogramas
-		fmt.Printf("%s = %s, %s = %s\n%s = %s, %s = %s\n",
-			f, tempconv.FToC(f), c, tempconv.CToF(c), ft, lenconv.FToM(ft), mt, lenconv.MToF(mt))
+		fmt.Printf("%s = %s, %s = %s\n%s = %s, %s = %s\n%s = %s, %s = %s\n", f, tempconv.FToC(f), c, tempconv.CToF(c), ft, lenconv.FToM(ft), mt, lenconv.MToF(mt), kg, weightconv.KToP(kg), p, weightconv.PToK(p))
+
 	}
 }
