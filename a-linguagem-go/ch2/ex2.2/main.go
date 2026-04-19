@@ -53,7 +53,7 @@ func main() {
 func converteArg(s string) error {
 	v, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return fmt.Errorf("%v", err)
+		return err
 	}
 	f := tempconv.Fahrenheit(v)
 	c := tempconv.Celsius(v)
