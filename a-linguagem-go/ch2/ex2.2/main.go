@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/luanlucolli/estudos-go/a-linguagem-go/ch2/lenconv"
 	"github.com/luanlucolli/estudos-go/a-linguagem-go/ch2/tempconv"
@@ -33,25 +34,26 @@ func main() {
 		}
 	} else {
 		scanner := bufio.NewScanner(os.Stdin)
-		scanner.Split(bufio.ScanWords)
-		for scanner.Scan() {
-			err := converteArg(scanner.Text())
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v: erro na conversão: %v\n", scanner.Text(), err)
+
+		if scanner.Scan() {
+			linha := scanner.Text()
+			palavras := strings.Fields(linha)
+
+			for _, palavra := range palavras {
+				err := converteArg(palavra)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "%v: erro na conversão: %v\n", palavra, err)
+				}
 			}
 		}
 
-		if err := scanner.Err(); err != nil {
-			fmt.Fprintf(os.Stderr, "erro na leitura: %v\n", err)
-			os.Exit(1)
-		}
 	}
 }
 
 func converteArg(s string) error {
 	v, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return fmt.Errorf("número inválido '%s': %v", s, err)
+		return fmt.Errorf("%v", err)
 	}
 	f := tempconv.Fahrenheit(v)
 	c := tempconv.Celsius(v)
