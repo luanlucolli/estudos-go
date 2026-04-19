@@ -21,7 +21,6 @@ import (
 )
 
 func main() {
-
 	args := os.Args[1:]
 
 	//checar se tem args
@@ -46,7 +45,6 @@ func main() {
 				}
 			}
 		}
-
 	}
 }
 
@@ -55,6 +53,7 @@ func converteArg(s string) error {
 	if err != nil {
 		return err
 	}
+
 	f := tempconv.Fahrenheit(v)
 	c := tempconv.Celsius(v)
 	ft := lenconv.Foot(v)
@@ -66,5 +65,6 @@ func converteArg(s string) error {
 	fmt.Printf("Temperatura: %s = %s, %s = %s\n", f, tempconv.FToC(f), c, tempconv.CToF(c))
 	fmt.Printf("Comprimento: %s = %s, %s = %s\n", ft, lenconv.FToM(ft), mt, lenconv.MToF(mt))
 	fmt.Printf("Peso:        %s = %s, %s = %s\n\n", kg, weightconv.KToP(kg), p, weightconv.PToK(p))
+
 	return nil
 }
