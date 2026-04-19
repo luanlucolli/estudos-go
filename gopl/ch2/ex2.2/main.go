@@ -15,9 +15,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/luanlucolli/estudos-go/a-linguagem-go/ch2/lenconv"
-	"github.com/luanlucolli/estudos-go/a-linguagem-go/ch2/tempconv"
-	"github.com/luanlucolli/estudos-go/a-linguagem-go/ch2/weightconv"
+	"github.com/luanlucolli/estudos-go/gopl/ch2/lenconv"
+	"github.com/luanlucolli/estudos-go/gopl/ch2/tempconv"
+	"github.com/luanlucolli/estudos-go/gopl/ch2/weightconv"
 )
 
 func main() {

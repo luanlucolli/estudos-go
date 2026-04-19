@@ -8,7 +8,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/luanlucolli/estudos-go/a-linguagem-go/ch2/tempconv"
+	"github.com/luanlucolli/estudos-go/gopl/ch2/tempconv"
 )
 
 func main() {
