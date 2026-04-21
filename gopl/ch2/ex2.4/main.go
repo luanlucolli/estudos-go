@@ -7,23 +7,14 @@ package main
 
 import "fmt"
 
-// pc[i] é a população de i
-var pc [256]byte
-
-func init() {
-	for i := range pc {
-		pc[i] = pc[i/2] + byte(i&1)
-	}
-}
-
 // PopCount devolve a população (número de bits definidos) de x
 func PopCount(x uint64) int {
 	count := 0
-	for i := 0; i < 64; i++ {
+	for i := 0; i < 64 && x != 0; i++ {
 		count += int(x & 1)
 		x >>= 1
 	}
-	return int(count)
+	return count
 }
 
 func main() {
