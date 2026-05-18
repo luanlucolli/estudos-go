@@ -31,7 +31,7 @@ type surfaceFunc func(x, y float64) float64
 
 func main() {
 
-	funcaoEscolhida := eggBox
+	funcaoEscolhida := moguls
 
 	fmt.Printf("<svg xmlns='http://www.w3.org/2000/svg' "+
 		"style='stroke: grey; fill: white; strokewidth: 0.7' "+
@@ -67,7 +67,7 @@ func corner(i, j int, f surfaceFunc) (float64, float64, bool) {
 	sy := height/2 + (x+y)*sin30*xyscale - z*zscale
 	return sx, sy, true
 }
-func f(x, y float64) float64 {
+func sombrero(x, y float64) float64 {
 	r := math.Hypot(x, y) // distância de (0,0)
 	return math.Sin(r) / r
 }
