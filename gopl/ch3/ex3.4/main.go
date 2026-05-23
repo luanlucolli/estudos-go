@@ -26,11 +26,8 @@ type RenderContext struct {
 	xyrange            float64
 	angle              float64
 	maxColor, minColor string
-	surfacaceFunction  surfaceFunc
+	surfaceFunction    func(x, y float64) float64
 }
-
-// molde da função passada como argumento na função corner
-type surfaceFunc func(x, y float64) float64
 
 func main() {
 
@@ -44,39 +41,7 @@ func main() {
 
 func surface3D(w http.ResponseWriter, r *http.Request) {
 
-	// define a forma da superficie 3d
-	var surfaceFunction surfaceFunc = sombrero
-
-	// cria maps com os valores aceitos no query params da url
-	surfaceColors := map[string]string{
-		"maxColor": "#ff0000",
-		"minColor": "#0000ff",
-	}
-	surfaceValues := map[string]float64{
-		"width":  600,
-		"height": 320,
-	}
-
-	// chama a função que extrai os valores dos query params e atualiza nos maps
-	processQueryParams(surfaceValues, surfaceColors, &surfaceFunction, r)
-
-	// monta a struct e define valores que não dependem de operações com outros valores da mesma struct
-	ctx := &RenderContext{
-		width:             surfaceValues["width"],
-		height:            surfaceValues["height"],
-		maxColor:          surfaceColors["maxColor"],
-		minColor:          surfaceColors["minColor"],
-		cells:             100.0,
-		xyrange:           30.0,
-		angle:             math.Pi / 6,
-		surfacaceFunction: surfaceFunction,
-	}
-
-	// termina de definir valores da sruct
-	ctx.xyscale = ctx.width / 2 / ctx.xyrange
-	ctx.zscale = ctx.height * 0.4
-	ctx.sin30 = math.Sin(ctx.angle)
-	ctx.cos30 = math.Cos(ctx.angle)
+	ctx := NewRenderContextFromRequest(r)
 
 	// seta o header para image/svg+xml
 	w.Header().Set("Content-Type", "image/svg+xml")
@@ -108,54 +73,67 @@ func surface3D(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// extrai os query params e atualiza os maps se houver valor nas keys
-// não retorna nada, atualiza o map diretamente
-func processQueryParams(surfaceValues map[string]float64, surfaceColors map[string]string, surfaceFunction *surfaceFunc, r *http.Request) {
+func NewRenderContextFromRequest(r *http.Request) *RenderContext {
+
+	// monta a struct e define valores que não dependem de operações com outros valores da mesma struct
+	ctx := &RenderContext{
+		width:           600,
+		height:          320,
+		maxColor:        "#ff0000",
+		minColor:        "#0000ff",
+		cells:           100.0,
+		xyrange:         30.0,
+		angle:           math.Pi / 6,
+		surfaceFunction: sombrero,
+	}
 
 	query := r.URL.Query()
 
-	for key := range surfaceValues {
-
-		valStr := query.Get(key)
-
-		if valStr == "" {
-			continue
+	// extrai, valida e salva largura e altura
+	if w := query.Get("width"); w != "" {
+		if val, err := strconv.ParseFloat(w, 64); err == nil {
+			if val > 0 {
+				ctx.width = val
+			}
 		}
-
-		valFloat, err := strconv.ParseFloat(valStr, 64)
-		if err != nil {
-			log.Printf("Erro ao converter query key '%s': %v", key, err)
-			continue
+	}
+	if h := query.Get("height"); h != "" {
+		if val, err := strconv.ParseFloat(h, 64); err == nil {
+			if val > 0 {
+				ctx.height = val
+			}
 		}
-
-		surfaceValues[key] = valFloat
-
 	}
 
-	for key := range surfaceColors {
-
-		valStr := query.Get(key)
-
-		if valStr == "" {
-			continue
-		}
-
-		surfaceColors[key] = valStr
-
+	// extrai e salva cor maxima e cor minima
+	if mxc := query.Get("maxColor"); mxc != "" {
+		ctx.maxColor = mxc
+	}
+	if mnc := query.Get("minColor"); mnc != "" {
+		ctx.minColor = mnc
 	}
 
-	tipo := query.Get("type")
+	// extrai e salva tipo da superficie
+	surfaceType := query.Get("type")
 
-	switch tipo {
+	switch surfaceType {
 	case "sombrero":
-		*surfaceFunction = sombrero
+		ctx.surfaceFunction = sombrero
 	case "eggbox":
-		*surfaceFunction = eggBox
+		ctx.surfaceFunction = eggBox
 	case "saddle":
-		*surfaceFunction = saddle
+		ctx.surfaceFunction = saddle
 	case "moguls":
-		*surfaceFunction = moguls
+		ctx.surfaceFunction = moguls
 	}
+
+	// termina de definir valores da sruct
+	ctx.xyscale = ctx.width / 2 / ctx.xyrange
+	ctx.zscale = ctx.height * 0.4
+	ctx.sin30 = math.Sin(ctx.angle)
+	ctx.cos30 = math.Cos(ctx.angle)
+
+	return ctx
 
 }
 
@@ -163,7 +141,7 @@ func (ctx *RenderContext) corner(i, j int) (float64, float64, float64, bool) { /
 	x := ctx.xyrange * (float64(i)/ctx.cells - 0.5)
 	y := ctx.xyrange * (float64(j)/ctx.cells - 0.5)
 	// Calcula a altura z da superfície
-	z := ctx.surfacaceFunction(x, y)
+	z := ctx.surfaceFunction(x, y)
 	if math.IsInf(z, 0) || math.IsNaN(z) {
 		return 0, 0, 0, false
 	}
