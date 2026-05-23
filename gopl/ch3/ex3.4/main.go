@@ -62,13 +62,14 @@ func surface3D(w http.ResponseWriter, r *http.Request) {
 
 	// monta a struct e define valores que não dependem de operações com outros valores da mesma struct
 	ctx := &RenderContext{
-		width:    surfaceValues["width"],
-		height:   surfaceValues["height"],
-		maxColor: surfaceColors["maxColor"],
-		minColor: surfaceColors["minColor"],
-		cells:    100.0,
-		xyrange:  30.0,
-		angle:    math.Pi / 6,
+		width:             surfaceValues["width"],
+		height:            surfaceValues["height"],
+		maxColor:          surfaceColors["maxColor"],
+		minColor:          surfaceColors["minColor"],
+		cells:             100.0,
+		xyrange:           30.0,
+		angle:             math.Pi / 6,
+		surfacaceFunction: surfaceFunction,
 	}
 
 	// termina de definir valores da sruct
@@ -85,10 +86,10 @@ func surface3D(w http.ResponseWriter, r *http.Request) {
 		"width='%g' height='%g'>", ctx.width, ctx.height)
 	for i := 0; i < int(ctx.cells); i++ {
 		for j := 0; j < int(ctx.cells); j++ {
-			ax, ay, zA, okA := ctx.corner(i+1, j, surfaceFunction)
-			bx, by, zB, okB := ctx.corner(i, j, surfaceFunction)
-			cx, cy, zC, okC := ctx.corner(i, j+1, surfaceFunction)
-			dx, dy, zD, okD := ctx.corner(i+1, j+1, surfaceFunction)
+			ax, ay, zA, okA := ctx.corner(i+1, j)
+			bx, by, zB, okB := ctx.corner(i, j)
+			cx, cy, zC, okC := ctx.corner(i, j+1)
+			dx, dy, zD, okD := ctx.corner(i+1, j+1)
 
 			zAverage := (zA + zB + zC + zD) / 4.0
 
@@ -158,11 +159,11 @@ func processQueryParams(surfaceValues map[string]float64, surfaceColors map[stri
 
 }
 
-func (ctx *RenderContext) corner(i, j int, f surfaceFunc) (float64, float64, float64, bool) { // Encontra o ponto (x,y) no canto da célula (i,j)
+func (ctx *RenderContext) corner(i, j int) (float64, float64, float64, bool) { // Encontra o ponto (x,y) no canto da célula (i,j)
 	x := ctx.xyrange * (float64(i)/ctx.cells - 0.5)
 	y := ctx.xyrange * (float64(j)/ctx.cells - 0.5)
 	// Calcula a altura z da superfície
-	z := f(x, y)
+	z := ctx.surfacaceFunction(x, y)
 	if math.IsInf(z, 0) || math.IsNaN(z) {
 		return 0, 0, 0, false
 	}
