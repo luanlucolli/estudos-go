@@ -39,11 +39,12 @@ func main() {
 
 }
 
+// surface3D atua como o handler HTTP responsável por orquestrar a renderização e o envio do SVG.
 func surface3D(w http.ResponseWriter, r *http.Request) {
 
 	ctx := NewRenderContextFromRequest(r)
 
-	// seta o header para image/svg+xml
+	// força o navegador a ativar o motor gráfico para renderizar o vetor, em vez de exibir como texto
 	w.Header().Set("Content-Type", "image/svg+xml")
 
 	fmt.Fprintf(w, "<svg xmlns='http://www.w3.org/2000/svg' "+
@@ -73,6 +74,7 @@ func surface3D(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// NewRenderContextFromRequest extrai a query, trata os valores e retorna a struct
 func NewRenderContextFromRequest(r *http.Request) *RenderContext {
 
 	// monta a struct e define valores que não dependem de operações com outros valores da mesma struct
@@ -167,6 +169,7 @@ func moguls(x, y float64) float64 {
 	return math.Cos(x) * math.Sin(y) * 0.1
 }
 
+// polygonColor define a cor do poligono baseado na alura dele
 func polygonColor(x float64, maxColor, minColor string) string {
 
 	if x > 0 {
