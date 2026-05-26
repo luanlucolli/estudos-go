@@ -4,7 +4,7 @@ de partida de acordo com o número de iterações necessárias para se
 aproximar de uma das quatro raízes. Pinte cada ponto segundo a raiz da
 qual ele se aproxima.*/
 
-// Mandelbrot gera uma imagem PNG do fractal de Mandelbrot.
+// gera uma imagem PNG do fractal de Newton.
 package main
 
 import (
