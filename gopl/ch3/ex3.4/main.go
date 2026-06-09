@@ -18,7 +18,7 @@ import (
 	"strconv"
 )
 
-type RenderContext struct {
+type SurfaceRenderContext struct {
 	width, height      float64
 	xyscale, zscale    float64
 	sin30, cos30       float64
@@ -42,20 +42,20 @@ func main() {
 // surface3D atua como o handler HTTP responsável por orquestrar a renderização e o envio do SVG.
 func surface3D(w http.ResponseWriter, r *http.Request) {
 
-	ctx := NewRenderContextFromRequest(r)
+	srctx := NewSurfaceRenderContextFromRequest(r)
 
 	// força o navegador a ativar o motor gráfico para renderizar o vetor, em vez de exibir como texto
 	w.Header().Set("Content-Type", "image/svg+xml")
 
 	fmt.Fprintf(w, "<svg xmlns='http://www.w3.org/2000/svg' "+
 		"style='stroke: grey; fill: white; strokewidth: 0.7' "+
-		"width='%g' height='%g'>", ctx.width, ctx.height)
-	for i := 0; i < int(ctx.cells); i++ {
-		for j := 0; j < int(ctx.cells); j++ {
-			ax, ay, zA, okA := ctx.corner(i+1, j)
-			bx, by, zB, okB := ctx.corner(i, j)
-			cx, cy, zC, okC := ctx.corner(i, j+1)
-			dx, dy, zD, okD := ctx.corner(i+1, j+1)
+		"width='%g' height='%g'>", srctx.width, srctx.height)
+	for i := 0; i < int(srctx.cells); i++ {
+		for j := 0; j < int(srctx.cells); j++ {
+			ax, ay, zA, okA := srctx.corner(i+1, j)
+			bx, by, zB, okB := srctx.corner(i, j)
+			cx, cy, zC, okC := srctx.corner(i, j+1)
+			dx, dy, zD, okD := srctx.corner(i+1, j+1)
 
 			zAverage := (zA + zB + zC + zD) / 4.0
 
@@ -63,7 +63,7 @@ func surface3D(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 
-			color := polygonColor(zAverage, ctx.maxColor, ctx.minColor)
+			color := polygonColor(zAverage, srctx.maxColor, srctx.minColor)
 
 			fmt.Fprintf(w, "<polygon points='%g,%g %g,%g %g,%g %g,%g' fill='%s'/>\n",
 				ax, ay, bx, by, cx, cy, dx, dy, color)
@@ -74,11 +74,11 @@ func surface3D(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// NewRenderContextFromRequest extrai a query, trata os valores e retorna a struct
-func NewRenderContextFromRequest(r *http.Request) *RenderContext {
+// NewSurfaceRenderContextFromRequest extrai a query, trata os valores e retorna a struct
+func NewSurfaceRenderContextFromRequest(r *http.Request) *SurfaceRenderContext {
 
 	// monta a struct e define valores que não dependem de operações com outros valores da mesma struct
-	ctx := &RenderContext{
+	srctx := &SurfaceRenderContext{
 		width:           600,
 		height:          320,
 		maxColor:        "#ff0000",
@@ -95,24 +95,24 @@ func NewRenderContextFromRequest(r *http.Request) *RenderContext {
 	if w := query.Get("width"); w != "" {
 		if val, err := strconv.ParseFloat(w, 64); err == nil {
 			if val > 0 {
-				ctx.width = val
+				srctx.width = val
 			}
 		}
 	}
 	if h := query.Get("height"); h != "" {
 		if val, err := strconv.ParseFloat(h, 64); err == nil {
 			if val > 0 {
-				ctx.height = val
+				srctx.height = val
 			}
 		}
 	}
 
 	// extrai e salva cor maxima e cor minima
 	if mxc := query.Get("maxColor"); mxc != "" {
-		ctx.maxColor = mxc
+		srctx.maxColor = mxc
 	}
 	if mnc := query.Get("minColor"); mnc != "" {
-		ctx.minColor = mnc
+		srctx.minColor = mnc
 	}
 
 	// extrai e salva tipo da superficie
@@ -120,36 +120,36 @@ func NewRenderContextFromRequest(r *http.Request) *RenderContext {
 
 	switch surfaceType {
 	case "sombrero":
-		ctx.surfaceFunction = sombrero
+		srctx.surfaceFunction = sombrero
 	case "eggbox":
-		ctx.surfaceFunction = eggBox
+		srctx.surfaceFunction = eggBox
 	case "saddle":
-		ctx.surfaceFunction = saddle
+		srctx.surfaceFunction = saddle
 	case "moguls":
-		ctx.surfaceFunction = moguls
+		srctx.surfaceFunction = moguls
 	}
 
 	// termina de definir valores da sruct
-	ctx.xyscale = ctx.width / 2 / ctx.xyrange
-	ctx.zscale = ctx.height * 0.4
-	ctx.sin30 = math.Sin(ctx.angle)
-	ctx.cos30 = math.Cos(ctx.angle)
+	srctx.xyscale = srctx.width / 2 / srctx.xyrange
+	srctx.zscale = srctx.height * 0.4
+	srctx.sin30 = math.Sin(srctx.angle)
+	srctx.cos30 = math.Cos(srctx.angle)
 
-	return ctx
+	return srctx
 
 }
 
-func (ctx *RenderContext) corner(i, j int) (float64, float64, float64, bool) { // Encontra o ponto (x,y) no canto da célula (i,j)
-	x := ctx.xyrange * (float64(i)/ctx.cells - 0.5)
-	y := ctx.xyrange * (float64(j)/ctx.cells - 0.5)
+func (srctx *SurfaceRenderContext) corner(i, j int) (float64, float64, float64, bool) { // Encontra o ponto (x,y) no canto da célula (i,j)
+	x := srctx.xyrange * (float64(i)/srctx.cells - 0.5)
+	y := srctx.xyrange * (float64(j)/srctx.cells - 0.5)
 	// Calcula a altura z da superfície
-	z := ctx.surfaceFunction(x, y)
+	z := srctx.surfaceFunction(x, y)
 	if math.IsInf(z, 0) || math.IsNaN(z) {
 		return 0, 0, 0, false
 	}
 	// Faz uma projeção isométrica de (x,y,z) sobre (sx,sy) do canvas SVG 2D
-	sx := ctx.width/2 + (x-y)*ctx.cos30*ctx.xyscale
-	sy := ctx.height/2 + (x+y)*ctx.sin30*ctx.xyscale - z*ctx.zscale
+	sx := srctx.width/2 + (x-y)*srctx.cos30*srctx.xyscale
+	sy := srctx.height/2 + (x+y)*srctx.sin30*srctx.xyscale - z*srctx.zscale
 	return sx, sy, z, true
 }
 
